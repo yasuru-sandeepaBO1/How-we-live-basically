@@ -1,0 +1,5 @@
+build/
+circulation_sim
+circulation.dot
+circulation.png
+.DS_Store
