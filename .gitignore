@@ -1,5 +1,7 @@
 build/
+_build/
 circulation_sim
+circulation_visual
 circulation.dot
 circulation.png
 .DS_Store

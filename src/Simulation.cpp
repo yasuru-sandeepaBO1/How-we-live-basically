@@ -16,7 +16,7 @@ std::string Simulation::cellTypeName(CellType type) {
     return "Unknown";
 }
 
-double Simulation::lifespanFor(CellType type) {
+double Simulation::lifespanFor(CellType type) const {
     switch (type) {
         case CellType::RedBloodCell: return 120.0;
         case CellType::WhiteBloodCell: return 20.0;
@@ -75,7 +75,6 @@ std::vector<CellProfile> Simulation::run(CellType type, int cellCount, int maxSt
             cell.ageDays += daysPerStep(type);
             cell.distanceTravelledMeters += edgeDistance;
             cell.visits[next]++;
-
             if (next == cycleMarker) cell.completedCycles++;
         }
         profiles.push_back(std::move(cell));

@@ -4,10 +4,17 @@
 #include <unordered_map>
 #include <vector>
 
+enum class RouteType {
+    OxygenPoor,
+    OxygenRich,
+    Portal
+};
+
 struct Edge {
     int to{};
     double distanceMeters{};
     double flowRateLpm{};
+    RouteType routeType{RouteType::OxygenPoor};
 };
 
 struct Vertex {
@@ -19,7 +26,8 @@ class CirculatoryGraph {
 public:
     int addVertex(const std::string& name, bool isOrgan = false);
     void addEdge(const std::string& from, const std::string& to,
-                 double distanceMeters, double flowRateLpm);
+                 double distanceMeters, double flowRateLpm,
+                 RouteType routeType = RouteType::OxygenPoor);
 
     int indexOf(const std::string& name) const;
     const Vertex& vertex(int index) const;

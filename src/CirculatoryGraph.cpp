@@ -18,10 +18,11 @@ int CirculatoryGraph::addVertex(const std::string& name, bool isOrgan) {
 }
 
 void CirculatoryGraph::addEdge(const std::string& from, const std::string& to,
-                               double distanceMeters, double flowRateLpm) {
+                               double distanceMeters, double flowRateLpm,
+                               RouteType routeType) {
     int fromIndex = indexOf(from);
     int toIndex = indexOf(to);
-    adjacency_[fromIndex].push_back({toIndex, distanceMeters, flowRateLpm});
+    adjacency_[fromIndex].push_back({toIndex, distanceMeters, flowRateLpm, routeType});
 }
 
 int CirculatoryGraph::indexOf(const std::string& name) const {
@@ -40,6 +41,7 @@ std::vector<int> CirculatoryGraph::bfs(int start) const {
     std::queue<int> q;
     visited[start] = true;
     q.push(start);
+
     while (!q.empty()) {
         int current = q.front();
         q.pop();
@@ -98,7 +100,6 @@ std::pair<double, std::vector<int>> CirculatoryGraph::dijkstra(int start, int de
 
     std::vector<int> path;
     if (distance[destination] == INF) return {INF, path};
-
     for (int at = destination; at != -1; at = previous[at]) path.push_back(at);
     std::reverse(path.begin(), path.end());
     return {distance[destination], path};
@@ -113,8 +114,7 @@ void CirculatoryGraph::printGraph() const {
             const auto& edge = adjacency_[i][j];
             std::cout << vertices_[edge.to].name << " ["
                       << std::fixed << std::setprecision(2)
-                      << edge.distanceMeters << " m, "
-                      << edge.flowRateLpm << " L/min]";
+                      << edge.distanceMeters << " m, " << edge.flowRateLpm << " L/min]";
             if (j + 1 < adjacency_[i].size()) std::cout << ", ";
         }
         std::cout << '\n';
@@ -136,11 +136,12 @@ void CirculatoryGraph::exportDot(const std::string& filename) const {
 
     for (int from = 0; from < vertexCount(); ++from) {
         for (const auto& edge : adjacency_[from]) {
+            const char* color = edge.routeType == RouteType::OxygenRich ? "#e45b78" :
+                                edge.routeType == RouteType::Portal ? "#9b6bd6" : "#4c8bd6";
             out << "  \"" << vertices_[from].name << "\" -> \""
-                << vertices_[edge.to].name << "\" [label=\""
+                << vertices_[edge.to].name << "\" [color=\"" << color << "\", label=\""
                 << std::fixed << std::setprecision(2)
-                << edge.distanceMeters << " m | " << edge.flowRateLpm
-                << " L/min\"];\n";
+                << edge.distanceMeters << " m | " << edge.flowRateLpm << " L/min\"];\n";
         }
     }
     out << "}\n";
@@ -148,31 +149,45 @@ void CirculatoryGraph::exportDot(const std::string& filename) const {
 
 CirculatoryGraph buildDefaultCirculatoryGraph() {
     CirculatoryGraph graph;
+
     graph.addVertex("Right Atrium");
     graph.addVertex("Right Ventricle");
     graph.addVertex("Lungs", true);
     graph.addVertex("Left Atrium");
     graph.addVertex("Left Ventricle");
+    graph.addVertex("Aorta");
+    graph.addVertex("Venae Cavae");
     graph.addVertex("Brain", true);
-    graph.addVertex("Liver", true);
+    graph.addVertex("Heart Muscle", true);
     graph.addVertex("Kidneys", true);
-    graph.addVertex("Muscles", true);
-    graph.addVertex("Digestive System", true);
+    graph.addVertex("Liver", true);
+    graph.addVertex("Digestive Tract", true);
+    graph.addVertex("Spleen", true);
+    graph.addVertex("Other Tissues", true);
 
-    graph.addEdge("Right Atrium", "Right Ventricle", 0.08, 5.0);
-    graph.addEdge("Right Ventricle", "Lungs", 0.20, 5.0);
-    graph.addEdge("Lungs", "Left Atrium", 0.20, 5.0);
-    graph.addEdge("Left Atrium", "Left Ventricle", 0.08, 5.0);
-    graph.addEdge("Left Ventricle", "Brain", 0.45, 0.75);
-    graph.addEdge("Left Ventricle", "Liver", 0.55, 1.25);
-    graph.addEdge("Left Ventricle", "Kidneys", 0.60, 1.00);
-    graph.addEdge("Left Ventricle", "Muscles", 0.80, 1.50);
-    graph.addEdge("Left Ventricle", "Digestive System", 0.70, 0.50);
-    graph.addEdge("Brain", "Right Atrium", 0.45, 0.75);
-    graph.addEdge("Liver", "Right Atrium", 0.55, 1.25);
-    graph.addEdge("Kidneys", "Right Atrium", 0.60, 1.00);
-    graph.addEdge("Muscles", "Right Atrium", 0.80, 1.50);
-    graph.addEdge("Digestive System", "Right Atrium", 0.70, 0.50);
+    graph.addEdge("Right Atrium", "Right Ventricle", 0.08, 5.0, RouteType::OxygenPoor);
+    graph.addEdge("Right Ventricle", "Lungs", 0.20, 5.0, RouteType::OxygenPoor);
+    graph.addEdge("Lungs", "Left Atrium", 0.20, 5.0, RouteType::OxygenRich);
+    graph.addEdge("Left Atrium", "Left Ventricle", 0.08, 5.0, RouteType::OxygenRich);
+    graph.addEdge("Left Ventricle", "Aorta", 0.12, 5.0, RouteType::OxygenRich);
+
+    graph.addEdge("Aorta", "Brain", 0.45, 0.75, RouteType::OxygenRich);
+    graph.addEdge("Aorta", "Heart Muscle", 0.18, 0.25, RouteType::OxygenRich);
+    graph.addEdge("Aorta", "Kidneys", 0.60, 1.00, RouteType::OxygenRich);
+    graph.addEdge("Aorta", "Liver", 0.55, 0.35, RouteType::OxygenRich);
+    graph.addEdge("Aorta", "Digestive Tract", 0.70, 1.10, RouteType::OxygenRich);
+    graph.addEdge("Aorta", "Spleen", 0.68, 0.30, RouteType::OxygenRich);
+    graph.addEdge("Aorta", "Other Tissues", 0.80, 1.25, RouteType::OxygenRich);
+
+    graph.addEdge("Brain", "Venae Cavae", 0.45, 0.75, RouteType::OxygenPoor);
+    graph.addEdge("Heart Muscle", "Venae Cavae", 0.18, 0.25, RouteType::OxygenPoor);
+    graph.addEdge("Kidneys", "Venae Cavae", 0.60, 1.00, RouteType::OxygenPoor);
+    graph.addEdge("Liver", "Venae Cavae", 0.55, 1.45, RouteType::OxygenPoor);
+    graph.addEdge("Other Tissues", "Venae Cavae", 0.80, 1.25, RouteType::OxygenPoor);
+    graph.addEdge("Venae Cavae", "Right Atrium", 0.15, 5.0, RouteType::OxygenPoor);
+
+    graph.addEdge("Digestive Tract", "Liver", 0.28, 1.10, RouteType::Portal);
+    graph.addEdge("Spleen", "Liver", 0.24, 0.30, RouteType::Portal);
 
     return graph;
 }

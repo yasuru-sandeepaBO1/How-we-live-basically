@@ -32,7 +32,7 @@ public:
 
 private:
     int chooseNextVertex(int current, double& edgeDistance);
-    double lifespanFor(CellType type);
+    double lifespanFor(CellType type) const;
     double daysPerStep(CellType type) const;
 
     const CirculatoryGraph& graph_;

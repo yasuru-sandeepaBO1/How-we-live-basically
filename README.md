@@ -4,35 +4,80 @@ This is our Graph Theory project for simulating a simplified human blood circula
 
 ## What we are doing
 
-- Represent the four heart chambers, lungs and important organs as graph vertices.
-- Represent blood vessels as directed weighted edges.
-- Store distance and flow rate for each connection.
-- Implement BFS and DFS ourselves using an adjacency list.
-- Use Dijkstra's algorithm to find the shortest route between two locations.
-- Represent Red Blood Cells, White Blood Cells and Platelets using separate C++ structures and simulate them moving through the graph.
-- Keep track of how many times cells visit each organ and calculate visit probabilities.
-- Use different lifespans for the three cell types.
-- Export the graph as a Graphviz `.dot` file so the circulation network can be visualized.
+- Heart chambers, lungs and main organs are vertices.
+- Blood vessels are directed weighted edges.
+- Edge weights store distance and flow rate.
+- The graph is stored using an adjacency list.
+- BFS, DFS and Dijkstra are implemented in C++.
+- RBC, WBC and Platelets move through the graph.
+- Flow rate is used when choosing a path at a branch.
+- Organ visits, movement counts and probabilities can be profiled.
+- The visual program shows oxygen-rich, oxygen-poor and portal routes with moving blood cells.
 
-## Main idea
+## Visual simulator
 
-The circulatory system is treated as a directed weighted graph. A blood cell starts at a location and moves through connected blood vessels. At branches, the flow-rate values are used as weights when selecting the next path.
+The main visual version uses SFML only for drawing the window. The graph and algorithms are still our own C++ code.
 
-## Build
+The screen contains the circulation graph on the left and the live controls/statistics on the right. Blood cells move along the directed edges while the simulation is running.
 
-Requires a C++17 compiler.
+### Build on macOS / Linux
+
+You need Git, CMake and a C++17 compiler. SFML 2.6.1 is downloaded automatically by CMake when the project is configured.
+
+```bash
+git clone https://github.com/yasuru-sandeepaBO1/How-we-live-basically.git
+cd How-we-live-basically
+cmake -S . -B build
+cmake --build build -j
+./build/circulation_visual
+```
+
+On macOS, if the compiler tools are missing:
+
+```bash
+xcode-select --install
+```
+
+If CMake is missing and Homebrew is installed:
+
+```bash
+brew install cmake
+```
+
+### Visual controls
+
+- **Pause / Resume** button: stops or continues the moving cells.
+- **Speed** button: cycles through 1x, 2x, 5x, 10x and 0.5x.
+- **Space bar**: pause/resume shortcut.
+
+## Terminal version
+
+The terminal version is still included because it is easier to demonstrate BFS, DFS and Dijkstra step by step.
 
 ```bash
 g++ -std=c++17 -O2 -Wall -Wextra -pedantic src/main.cpp src/CirculatoryGraph.cpp src/Simulation.cpp -o circulation_sim
 ./circulation_sim
 ```
 
-Graph visualization is exported to `circulation.dot`. If Graphviz is installed, it can be converted to an image with:
+It can also export `circulation.dot` for Graphviz.
 
-```bash
-dot -Tpng circulation.dot -o circulation.png
-```
+## Current graph
 
-## Project status
+The graph contains:
 
-First working version includes the graph, BFS, DFS, shortest-path calculation, cell simulation, profiling and Graphviz export. We can improve the visual simulation and biological assumptions after testing the core program.
+- Right Atrium
+- Right Ventricle
+- Left Atrium
+- Left Ventricle
+- Lungs
+- Aorta
+- Venae Cavae
+- Brain
+- Heart Muscle
+- Kidneys
+- Liver
+- Digestive Tract
+- Spleen
+- Other Tissues
+
+The numbers used for distance and flow are simplified assumptions for the graph simulation, not medical measurements for a real patient.
