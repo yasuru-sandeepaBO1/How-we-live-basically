@@ -12,11 +12,9 @@ This is our Graph Theory project for simulating a simplified human blood circula
 - Red Blood Cells, White Blood Cells and Platelets move through the graph.
 - Flow rate is used when choosing a path at a branch.
 - The program keeps track of organ visits, movements and probabilities.
-- A visual version is also available to show the circulation graph and moving blood cells.
+- The graph can be exported as a Graphviz `.dot` file.
 
-## How to run on Windows
-
-### Terminal program
+## How to run
 
 Compile the C++ files using a C++17 compiler:
 
@@ -24,30 +22,35 @@ Compile the C++ files using a C++17 compiler:
 g++ -std=c++17 src/main.cpp src/CirculatoryGraph.cpp src/Simulation.cpp -o circulation_sim
 ```
 
-Then run:
+On macOS/Linux:
+
+```bash
+./circulation_sim
+```
+
+On Windows:
 
 ```bash
 circulation_sim.exe
 ```
 
-This opens the terminal menu where we can view the graph connections, run BFS and DFS, find shortest paths, simulate the blood cells and export the graph.
+The terminal menu can be used to view graph connections, run BFS and DFS, find the shortest route, run the blood-cell profiling options and export the Graphviz file.
 
-### Visual program
+## Graphviz map
 
-The visual version is built using CMake.
+Choose the Graphviz export option from the terminal menu to create:
 
-```bash
-cmake -S . -B build
-cmake --build build
+```text
+circulation.dot
 ```
 
-Then run:
+If Graphviz is installed, the file can be converted into an image.
+
+For example:
 
 ```bash
-build\circulation_visual.exe
+dot -Tpng circulation.dot -o circulation.png
 ```
-
-This opens the graphical circulation view.
 
 ## Current graph
 
