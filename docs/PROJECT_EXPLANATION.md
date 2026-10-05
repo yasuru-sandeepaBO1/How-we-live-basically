@@ -17,7 +17,7 @@ The right side of the heart mainly receives oxygen-poor blood from the body and 
 
 The left side of the heart receives oxygen-rich blood from the lungs and sends it to the rest of the body.
 
-A very simplified circulation path is:
+A simplified circulation path is:
 
 ```text
 Body
@@ -72,7 +72,7 @@ The assignment asks us to represent three types of blood cells separately.
 
 Red Blood Cells are mainly responsible for carrying oxygen.
 
-In our program they travel through the same circulation graph and we keep track of things such as:
+In our program they travel through the circulation graph and we keep track of things such as:
 
 - number of movements
 - organs visited
@@ -146,13 +146,13 @@ The graph is stored using an adjacency list.
 
 Each vertex keeps a list of the vertices that can be reached from it.
 
-This is the main graph data structure used by BFS, DFS, Dijkstra and the blood-cell simulation.
+This is the main graph data structure used by BFS, DFS, Dijkstra and the blood-cell profiling.
 
 ---
 
 ## 4. What we can do from the terminal program
 
-When the normal C++ program is run, it shows a menu.
+When the C++ program is run, it shows a menu.
 
 | Option | What it does |
 |---|---|
@@ -160,10 +160,10 @@ When the normal C++ program is run, it shows a menu.
 | BFS traversal | Runs Breadth-First Search from a selected starting vertex and prints the visiting order. |
 | DFS traversal | Runs Depth-First Search from a selected starting vertex and prints the visiting order. |
 | Shortest route (Dijkstra) | Finds the shortest path between two selected vertices using distance as the weight. |
-| Simulate Red Blood Cells | Simulates Red Blood Cells moving through the circulation graph and shows profiling information. |
-| Simulate White Blood Cells | Simulates White Blood Cells moving through the circulation graph. |
-| Simulate Platelets | Simulates Platelets moving through the circulation graph. |
-| Run all three simulations | Runs the RBC, WBC and Platelet simulations one after another. |
+| Simulate Red Blood Cells | Runs the Red Blood Cell profiling through the circulation graph. |
+| Simulate White Blood Cells | Runs the White Blood Cell profiling through the circulation graph. |
+| Simulate Platelets | Runs the Platelet profiling through the circulation graph. |
+| Run all three simulations | Runs all three blood-cell profiling options one after another. |
 | Export Graphviz file | Creates a `circulation.dot` file that can be used to draw the graph using Graphviz. |
 | Exit | Closes the program. |
 
@@ -174,8 +174,6 @@ When the normal C++ program is run, it shows a menu.
 BFS means Breadth-First Search.
 
 It starts from one vertex and first visits the directly connected vertices before going deeper.
-
-For example, if BFS starts at the Left Ventricle, it first reaches the Aorta and then the organs connected through it.
 
 A queue is used for BFS.
 
@@ -199,24 +197,13 @@ Dijkstra's algorithm is used because our graph has weights.
 
 For this project, distance is used as the weight for the shortest-path calculation.
 
-The user selects:
-
-```text
-Start vertex
-Destination vertex
-```
-
-Then the program prints the shortest directed route and its total distance.
+The user selects a start vertex and a destination vertex. The program then prints the shortest directed route and its total distance.
 
 ---
 
-## 8. How the blood-cell simulation works
+## 8. How the blood-cell profiling works
 
-A blood cell starts at a vertex in the graph.
-
-It then follows one of the outgoing edges.
-
-If there is only one outgoing edge, the next location is clear.
+A blood cell starts at a vertex in the graph and follows one of the outgoing edges.
 
 If there are several possible routes, the flow-rate values are used as weights when selecting the next path.
 
@@ -240,21 +227,17 @@ organ visits / total organ visits
 
 ---
 
-## 9. How the visual version works
+## 9. Graphviz map
 
-The visual version uses the same circulation graph.
+The terminal program can export the circulation graph as:
 
-The C++ graph and algorithms still contain the actual logic.
+```text
+circulation.dot
+```
 
-The graphics part only draws:
+This file contains the same graph vertices and directed edges used by the program.
 
-- vertices
-- directed routes
-- different route types
-- moving blood-cell markers
-- some live values
-
-CMake is only used to configure and build this version. CMake itself is not the visualizer.
+If Graphviz is installed, the file can be converted to an image such as PNG.
 
 ---
 
@@ -268,15 +251,10 @@ src/
   Simulation.h
   Simulation.cpp
   BloodCells.h
-  Visualization.h
-  Visualization.cpp
-  main_visual.cpp
 ```
 
-The main idea is to keep the graph logic and the visualization separate.
-
-`CirculatoryGraph` handles the graph and algorithms.
+`CirculatoryGraph` handles the graph and graph algorithms.
 
 `Simulation` handles blood-cell movement and profiling.
 
-`Visualization` only shows the graph visually.
+`main.cpp` contains the terminal menu.
