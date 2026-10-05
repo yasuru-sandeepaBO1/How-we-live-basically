@@ -22,7 +22,7 @@ void showLocations(const CirculatoryGraph& graph) {
         std::cout << "  " << i << ". " << graph.vertex(i).name << '\n';
 }
 
-void printGap(int lines = 8) {
+void printGap(int lines = 5) {
     for (int i = 0; i < lines; ++i) std::cout << '\n';
 }
 
