@@ -16,11 +16,25 @@ This is our Graph Theory project for simulating a simplified human blood circula
 
 ## How to run
 
-Compile the C++ files using a C++17 compiler:
+### 1. Open the project folder
+
+If the project is in your Downloads folder:
+
+```bash
+cd ~/Downloads/How-we-live-basically
+```
+
+If your project is stored somewhere else, change the path accordingly.
+
+### 2. Compile the program
+
+Compile the C++ source files using a C++17 compiler:
 
 ```bash
 g++ -std=c++17 src/main.cpp src/CirculatoryGraph.cpp src/Simulation.cpp -o circulation_sim
 ```
+
+### 3. Run the program
 
 On macOS/Linux:
 
@@ -34,22 +48,64 @@ On Windows:
 circulation_sim.exe
 ```
 
-The terminal menu can be used to view graph connections, run BFS and DFS, find the shortest route, run the blood-cell profiling options and export the Graphviz file.
+The terminal menu can be used to:
+
+- View graph connections
+- Run BFS
+- Run DFS
+- Find the shortest route using Dijkstra
+- Run Red Blood Cell profiling
+- Run White Blood Cell profiling
+- Run Platelet profiling
+- Run all three profiling options
+- Export the Graphviz file
 
 ## Graphviz map
 
-Choose the Graphviz export option from the terminal menu to create:
+The program creates a Graphviz file named:
 
 ```text
 circulation.dot
 ```
 
-If Graphviz is installed, the file can be converted into an image.
+You can also choose option **9** from the terminal menu to export it again.
 
-For example:
+### Install Graphviz on macOS
+
+If Graphviz is not installed:
+
+```bash
+brew install graphviz
+```
+
+### Convert the DOT file to PNG
+
+Run:
 
 ```bash
 dot -Tpng circulation.dot -o circulation.png
+```
+
+This creates:
+
+```text
+circulation.png
+```
+
+### Open the generated graph on macOS
+
+```bash
+open circulation.png
+```
+
+### Quick command sequence for macOS
+
+```bash
+cd ~/Downloads/How-we-live-basically
+g++ -std=c++17 src/main.cpp src/CirculatoryGraph.cpp src/Simulation.cpp -o circulation_sim
+./circulation_sim
+dot -Tpng circulation.dot -o circulation.png
+open circulation.png
 ```
 
 ## Current graph
