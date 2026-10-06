@@ -17,7 +17,7 @@ std::string Simulation::cellTypeName(CellType type) {
     return "Unknown";
 }
 
-// Returns the simplified lifespan used for each cell type in this model.
+// Cell lifespan settings
 double Simulation::lifespanFor(CellType type) const {
     switch (type) {
         case CellType::RedBloodCell: return 120.0;
@@ -28,8 +28,6 @@ double Simulation::lifespanFor(CellType type) const {
     return 1.0;
 }
 
-// Each graph movement increases the simulated age by this amount.
-// These values are assumptions used to make the profiling finite and easy to compare.
 double Simulation::daysPerStep(CellType type) const {
     switch (type) {
         case CellType::RedBloodCell: return 2.0;
@@ -41,8 +39,6 @@ double Simulation::daysPerStep(CellType type) const {
 }
 
 // Flow-based path selection
-// When a vertex has several outgoing edges, the edge flow rates are used
-// as weights. A higher-flow edge therefore has a higher chance of being selected.
 int Simulation::chooseNextVertex(int current, double& edgeDistance) {
     const auto& edges = graph_.neighbors(current);
 
@@ -65,16 +61,12 @@ int Simulation::chooseNextVertex(int current, double& edgeDistance) {
 }
 
 // Blood-cell traversal
-// Creates the requested number of cells and moves each one through the graph.
-// A cell stops when it reaches the maximum requested steps or its simulated lifespan.
 std::vector<CellProfile> Simulation::run(CellType type, int cellCount, int maxStepsPerCell) {
     std::vector<CellProfile> profiles;
     profiles.reserve(cellCount);
 
-    // All cells begin at the Right Atrium.
     const int start = graph_.indexOf("Right Atrium");
 
-    // Reaching the Left Ventricle is used as the cycle marker in this model.
     const int cycleMarker = graph_.indexOf("Left Ventricle");
 
     for (int id = 1; id <= cellCount; ++id) {
@@ -85,7 +77,6 @@ std::vector<CellProfile> Simulation::run(CellType type, int cellCount, int maxSt
         cell.currentVertex = start;
         cell.lifespanDays = lifespanFor(type);
 
-        // Count the starting location as a visit.
         cell.visits[start]++;
 
         for (int step = 0;
@@ -95,13 +86,11 @@ std::vector<CellProfile> Simulation::run(CellType type, int cellCount, int maxSt
             double edgeDistance = 0.0;
             int next = chooseNextVertex(cell.currentVertex, edgeDistance);
 
-            // Safety check in case a vertex has no outgoing path.
             if (next == cell.currentVertex &&
                 graph_.neighbors(cell.currentVertex).empty()) {
                 break;
             }
 
-            // Update the profile after one movement through an edge.
             cell.currentVertex = next;
             cell.stepsTaken++;
             cell.ageDays += daysPerStep(type);
@@ -119,8 +108,7 @@ std::vector<CellProfile> Simulation::run(CellType type, int cellCount, int maxSt
     return profiles;
 }
 
-// Profiling
-// Combines the results from all cells of one type and prints the final statistics.
+// Profiling and probability calculation
 void Simulation::printSummary(CellType type, const std::vector<CellProfile>& profiles) const {
     std::unordered_map<int, long long> totalVisits;
 
@@ -129,7 +117,6 @@ void Simulation::printSummary(CellType type, const std::vector<CellProfile>& pro
     long long totalCycles = 0;
     double totalDistance = 0.0;
 
-    // Add together movement, cycle, distance and visit data from every cell.
     for (const auto& cell : profiles) {
         totalSteps += cell.stepsTaken;
         totalCycles += cell.completedCycles;
@@ -158,8 +145,6 @@ void Simulation::printSummary(CellType type, const std::vector<CellProfile>& pro
 
         long long visits = totalVisits[i];
 
-        // Probability here means the percentage of all organ visits
-        // that belong to this particular organ.
         double probability =
             organVisits == 0
                 ? 0.0
