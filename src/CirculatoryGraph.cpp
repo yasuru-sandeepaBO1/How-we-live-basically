@@ -8,8 +8,7 @@
 #include <queue>
 #include <stdexcept>
 
-// Adds a new vertex to the graph.
-// Every vertex also gets an empty adjacency list for its outgoing edges.
+// Graph construction
 int CirculatoryGraph::addVertex(const std::string& name, bool isOrgan) {
     if (nameToIndex_.count(name)) return nameToIndex_.at(name);
     int index = static_cast<int>(vertices_.size());
@@ -19,9 +18,6 @@ int CirculatoryGraph::addVertex(const std::string& name, bool isOrgan) {
     return index;
 }
 
-// Adds a directed weighted edge.
-// Distance and flow rate are stored with the edge because they are used later
-// for shortest-path calculations and blood-cell movement.
 void CirculatoryGraph::addEdge(const std::string& from, const std::string& to,
                                double distanceMeters, double flowRateLpm,
                                RouteType routeType) {
@@ -40,10 +36,7 @@ const Vertex& CirculatoryGraph::vertex(int index) const { return vertices_.at(in
 const std::vector<Edge>& CirculatoryGraph::neighbors(int index) const { return adjacency_.at(index); }
 int CirculatoryGraph::vertexCount() const { return static_cast<int>(vertices_.size()); }
 
-// BFS traversal
-// Breadth-First Search is implemented manually.
-// The queue only stores the next vertices to visit.
-// We still handle visited checking, neighbour traversal and traversal order ourselves.
+// BFS implementation
 std::vector<int> CirculatoryGraph::bfs(int start) const {
     std::vector<bool> visited(vertices_.size(), false);
     std::vector<int> order;
@@ -68,9 +61,7 @@ std::vector<int> CirculatoryGraph::bfs(int start) const {
     return order;
 }
 
-// DFS traversal
-// Recursive helper used by DFS.
-// It follows one path as far as possible before returning to try another path.
+// DFS implementation
 void CirculatoryGraph::dfsVisit(int current, std::vector<bool>& visited,
                                 std::vector<int>& order) const {
     visited[current] = true;
@@ -83,8 +74,6 @@ void CirculatoryGraph::dfsVisit(int current, std::vector<bool>& visited,
     }
 }
 
-// Starts DFS from a selected vertex.
-// visited prevents the algorithm from looping forever in our cyclic circulation graph.
 std::vector<int> CirculatoryGraph::dfs(int start) const {
     std::vector<bool> visited(vertices_.size(), false);
     std::vector<int> order;
@@ -93,18 +82,12 @@ std::vector<int> CirculatoryGraph::dfs(int start) const {
     return order;
 }
 
-// Dijkstra shortest path
-// Finds the shortest directed route between two vertices.
-// Distance in metres is used as the edge weight.
-// priority_queue is only used to efficiently get the next vertex with the
-// smallest known distance; the relaxation logic is implemented here.
+// Dijkstra implementation
 std::pair<double, std::vector<int>> CirculatoryGraph::dijkstra(int start, int destination) const {
     const double INF = std::numeric_limits<double>::infinity();
 
-    // Best known distance from the start vertex to every vertex.
     std::vector<double> distance(vertices_.size(), INF);
 
-    // Stores the previous vertex so the final shortest path can be rebuilt.
     std::vector<int> previous(vertices_.size(), -1);
 
     using Item = std::pair<double, int>;
@@ -117,17 +100,13 @@ std::pair<double, std::vector<int>> CirculatoryGraph::dijkstra(int start, int de
         auto [currentDistance, current] = pq.top();
         pq.pop();
 
-        // Ignore an older queue entry if a shorter route was already found.
         if (currentDistance > distance[current]) continue;
 
-        // We can stop once the destination is reached with the smallest distance.
         if (current == destination) break;
 
         for (const auto& edge : adjacency_[current]) {
             double candidate = currentDistance + edge.distanceMeters;
 
-            // Relaxation step:
-            // update the neighbour when this route is shorter than the old one.
             if (candidate < distance[edge.to]) {
                 distance[edge.to] = candidate;
                 previous[edge.to] = current;
@@ -139,7 +118,6 @@ std::pair<double, std::vector<int>> CirculatoryGraph::dijkstra(int start, int de
     std::vector<int> path;
     if (distance[destination] == INF) return {INF, path};
 
-    // Rebuild the path backwards using the previous array.
     for (int at = destination; at != -1; at = previous[at]) {
         path.push_back(at);
     }
@@ -148,7 +126,6 @@ std::pair<double, std::vector<int>> CirculatoryGraph::dijkstra(int start, int de
     return {distance[destination], path};
 }
 
-// Prints the adjacency-list view of the circulation graph.
 void CirculatoryGraph::printGraph() const {
     std::cout << "\n--- Circulatory Graph ---\n";
 
@@ -172,8 +149,7 @@ void CirculatoryGraph::printGraph() const {
     }
 }
 
-// Exports the graph in Graphviz DOT format.
-// The colours help show oxygen-rich, oxygen-poor and portal routes.
+// Graphviz DOT export
 void CirculatoryGraph::exportDot(const std::string& filename) const {
     std::ofstream out(filename);
     if (!out) throw std::runtime_error("Could not write " + filename);
@@ -208,9 +184,6 @@ void CirculatoryGraph::exportDot(const std::string& filename) const {
     out << "}\n";
 }
 
-// Builds the fixed circulation network used by the program.
-// Heart chambers, vessels and organs are vertices.
-// Blood-flow connections are directed weighted edges.
 CirculatoryGraph buildDefaultCirculatoryGraph() {
     CirculatoryGraph graph;
 
