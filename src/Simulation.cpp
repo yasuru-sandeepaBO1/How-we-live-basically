@@ -40,7 +40,7 @@ double Simulation::daysPerStep(CellType type) const {
     return 1.0;
 }
 
-// -------------------- Flow-based path selection --------------------
+// Flow-based path selection
 // When a vertex has several outgoing edges, the edge flow rates are used
 // as weights. A higher-flow edge therefore has a higher chance of being selected.
 int Simulation::chooseNextVertex(int current, double& edgeDistance) {
@@ -64,7 +64,7 @@ int Simulation::chooseNextVertex(int current, double& edgeDistance) {
     return selected.to;
 }
 
-// -------------------- Blood-cell traversal --------------------
+// Blood-cell traversal
 // Creates the requested number of cells and moves each one through the graph.
 // A cell stops when it reaches the maximum requested steps or its simulated lifespan.
 std::vector<CellProfile> Simulation::run(CellType type, int cellCount, int maxStepsPerCell) {
@@ -119,7 +119,7 @@ std::vector<CellProfile> Simulation::run(CellType type, int cellCount, int maxSt
     return profiles;
 }
 
-// -------------------- Profiling --------------------
+// Profiling
 // Combines the results from all cells of one type and prints the final statistics.
 void Simulation::printSummary(CellType type, const std::vector<CellProfile>& profiles) const {
     std::unordered_map<int, long long> totalVisits;
