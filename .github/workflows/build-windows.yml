@@ -1,0 +1,55 @@
+name: Build Windows executable
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "src/**"
+      - "CMakeLists.txt"
+      - ".github/workflows/build-windows.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up MSYS2 and GCC
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: mingw-w64-ucrt-x86_64-gcc
+
+      - name: Compile Windows executable
+        shell: msys2 {0}
+        run: |
+          mkdir -p "run version for windows"
+          g++ -std=c++17 -O2 -static -static-libgcc -static-libstdc++             src/main.cpp             src/CirculatoryGraph.cpp             src/Simulation.cpp             -o "run version for windows/circulation_sim.exe"
+
+      - name: Quick test
+        shell: msys2 {0}
+        run: |
+          printf "0\n" | "run version for windows/circulation_sim.exe"
+
+      - name: Commit executable to repository
+        shell: pwsh
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "run version for windows/circulation_sim.exe"
+          if (git diff --cached --quiet) {
+            Write-Host "Windows executable is already up to date."
+          } else {
+            git commit -m "Update Windows runnable executable"
+            git push origin HEAD:main
+          }
