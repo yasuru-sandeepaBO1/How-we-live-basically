@@ -40,7 +40,7 @@ const Vertex& CirculatoryGraph::vertex(int index) const { return vertices_.at(in
 const std::vector<Edge>& CirculatoryGraph::neighbors(int index) const { return adjacency_.at(index); }
 int CirculatoryGraph::vertexCount() const { return static_cast<int>(vertices_.size()); }
 
-// -------------------- BFS --------------------
+// BFS traversal
 // Breadth-First Search is implemented manually.
 // The queue only stores the next vertices to visit.
 // We still handle visited checking, neighbour traversal and traversal order ourselves.
@@ -68,7 +68,7 @@ std::vector<int> CirculatoryGraph::bfs(int start) const {
     return order;
 }
 
-// -------------------- DFS --------------------
+// DFS traversal
 // Recursive helper used by DFS.
 // It follows one path as far as possible before returning to try another path.
 void CirculatoryGraph::dfsVisit(int current, std::vector<bool>& visited,
@@ -93,7 +93,7 @@ std::vector<int> CirculatoryGraph::dfs(int start) const {
     return order;
 }
 
-// -------------------- Dijkstra --------------------
+// Dijkstra shortest path
 // Finds the shortest directed route between two vertices.
 // Distance in metres is used as the edge weight.
 // priority_queue is only used to efficiently get the next vertex with the
